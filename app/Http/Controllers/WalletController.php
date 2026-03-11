@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\WalletRequest;
 use App\Models\User;
 use App\Models\Wallet;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,22 +28,16 @@ class WalletController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Wallet $wallet)
+    public function store(WalletRequest $request, Wallet $wallet)
     {
-        $validate = $request->validate([
-            "name" => "required|string",
-            "balance" => "required|numeric|min:0",
-            "currency" => "required|string|max:3",
-        ]);
-
-        $validate["user_id"] = Auth::user()->id;
-        $wallet->create($validate);
-
-        return response()->json([
-            "success" => true,
-            "data" => $wallet,
-            "message" => "Created a wallet successfully",
-        ]);
+            $request->validated();
+            $validate["user_id"] = Auth::user()->id;
+            $wallet->create($validate);
+            return response()->json([
+                "success" => true,
+                "data" => ["wallet" => $wallet],
+                "message" => "Created a wallet successfully",
+            ]);
     }
 
     /**
