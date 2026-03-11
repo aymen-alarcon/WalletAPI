@@ -47,22 +47,34 @@ class WalletController extends Controller
      */
     public function show(Wallet $wallet)
     {
-        //
+        return response()->json([
+            "wallet" => $wallet,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Wallet $wallet)
+    public function deposit(Request $request, Wallet $wallet)
     {
-        //
+        $price = $wallet->price;
+        $validate["price"] = $price + $request->price;
+
+        $wallet->update($validate);
+
+        return response()->json(["price" => $wallet->price]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Wallet $wallet)
+    public function withdraw(Request $request, Wallet $wallet)
     {
-        //
+        $price = $wallet->price;
+        $validate["price"] = $price - $request->price;
+
+        $wallet->update($validate);
+
+        return response()->json(["price" => $wallet->price]);
     }
 }

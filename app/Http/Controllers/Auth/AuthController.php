@@ -23,9 +23,13 @@ class AuthController extends Controller
                     
             return response()->json([
                 "success" => true,
-                "data" => $validate,
-                "message" => "You have logged in successfully",
-                "token" => $token
+                "message" => "Connexion réussie.",
+                "data" => ["user" => $user, "token" => $token],
+            ]);
+        }   else{
+            return response()->json([
+                "success" => false,
+                "message" => "Identifiants incorrects."
             ]);
         }
     }
@@ -36,16 +40,16 @@ class AuthController extends Controller
 
         if(!$user){
             return response()->json([
-                'success'=> false,
-                'message'=> 'Utilisateur non connecte',
+                'success' => false,
+                'message' => 'Non authentifié.',
             ], 401);
         }
 
         $user->currentAccessToken()->delete();
 
         return response()->json([
-            'success'=>true,
-            'message'=> 'Logged Out Successfully' 
+            'success'=> true,
+            'message'=> 'Déconnexion réussie.' 
         ]);
     }
 
@@ -54,19 +58,29 @@ class AuthController extends Controller
         $validate = $request->validate([
             "name" => "required",
             "email" => "required|email",
-            "password" => "required",
+            "password" => "required|confirmed|min:8",
         ]);
 
         $validate["password"] = Hash::make($validate["password"]);
 
         $user = User::create($validate);
         $token = $user->createToken("UserToken")->plainTextToken;
-
-        return response()->json([
-            "success" => false,
-            "data" => $user,
-            "message" => "User Have Been created successfully",
-            "token" => $token,
-        ], 201);
+        if (User::contains($validate["email"])) {
+            return response()->json([
+                "success" => false,
+                "message" => "Erreur de validation.",
+                "errors" => [
+                    "email" => ["L'adresse email est déjà utilisée."],
+                    "password" => ["Le mot de passe doit contenir au moins 8 caractères."]
+                ]
+            ], 201);
+        } else {
+            return response()->json([
+                "success" => true,
+                "message" => "Inscription réussie.",
+                "data" => ["user" => $user, "token" => $token],
+            ], 201);
+        }
+        
     }
 }

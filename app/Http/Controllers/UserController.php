@@ -16,8 +16,11 @@ class UserController extends Controller
         $user = Auth::user();
 
         return response()->json([
-            "name" => $user->name,
-            "email" => $user->email,
+            "success" => true,
+            "message" => "Profil utilisateur récupéré.",
+            "data" => [
+                "user" => $user,
+            ]
         ]);
     }
 
