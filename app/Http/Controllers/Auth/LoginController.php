@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,15 +17,15 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($validate)) {
-            $request->session()
-                    ->regenerate();
+            $user = User::where("email", $request->email)->firstOrFail();
+            $token = $user->createToken("UserToken")->plainTextToken;
                     
             return response()->json([
-                "status" => "success",
+                "success" => true,
                 "data" => $validate,
                 "message" => "You have logged in successfully",
+                "token" => $token
             ]);
         }
-
     }
 }
