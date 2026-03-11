@@ -29,7 +29,9 @@ class WalletController extends Controller
     public function store(Request $request, Wallet $wallet)
     {
         $validate = $request->validate([
-            "price" => "required|numeric|min:0"
+            "name" => "required|string",
+            "balance" => "required|numeric|min:0",
+            "currency" => "required|string|max:3",
         ]);
 
         $validate["user_id"] = Auth::user()->id;
@@ -57,12 +59,12 @@ class WalletController extends Controller
      */
     public function deposit(Request $request, Wallet $wallet)
     {
-        $price = $wallet->price;
-        $validate["price"] = $price + $request->price;
+        $balance = $wallet->balance;
+        $validate["balance"] = $balance + $request->balance;
 
         $wallet->update($validate);
 
-        return response()->json(["price" => $wallet->price]);
+        return response()->json(["balance" => $wallet->balance]);
     }
 
     /**
@@ -70,11 +72,11 @@ class WalletController extends Controller
      */
     public function withdraw(Request $request, Wallet $wallet)
     {
-        $price = $wallet->price;
-        $validate["price"] = $price - $request->price;
+        $balance = $wallet->balance;
+        $validate["balance"] = $balance - $request->balance;
 
         $wallet->update($validate);
 
-        return response()->json(["price" => $wallet->price]);
+        return response()->json(["balance" => $wallet->balance]);
     }
 }
