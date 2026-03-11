@@ -20,6 +20,8 @@ class WalletController extends Controller
         $wallets = Wallet::where("user_id", Auth::user()->id)->get();
 
         return response()->json([
+            "success" => true,
+            "message" => "Liste des wallets récupérée.",
             "wallets" => $wallets,
         ]);
     }
@@ -45,9 +47,19 @@ class WalletController extends Controller
      */
     public function show(Wallet $wallet)
     {
-        return response()->json([
-            "wallet" => $wallet,
-        ]);
+        if ($wallet->user->id === Auth::user()->id) {
+            return response()->json([
+                "success" => false,
+                "message" => "Détail du wallet récupéré.",
+            ]);
+        } else {
+            return response()->json([
+                "success" => true,
+                "message" => "Détail du wallet récupéré.",
+                "wallet" => $wallet,
+            ]);
+        }
+        
     }
 
     /**
