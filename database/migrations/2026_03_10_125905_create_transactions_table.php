@@ -13,9 +13,14 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->float("price");
-            $table->foreignId("sender_id")->constrained("users");
-            $table->foreignId("receiver_id")->constrained("users");
+            $table->foreignId("wallet_id")
+                    ->constrained("wallets")
+                    ->cascadeOnDelete()
+                    ->cascadeOnUpdate();
+            $table->string("type");
+            $table->float("amount");
+            $table->string("description");
+            $table->float("balance_after");
             $table->timestamps();
         });
     }

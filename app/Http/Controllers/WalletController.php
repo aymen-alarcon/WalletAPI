@@ -69,15 +69,6 @@ class WalletController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function deposit(Request $request, Wallet $wallet)
-    {
-        $balance = $wallet->balance;
-        $validate["balance"] = $balance + $request->balance;
-
-        $wallet->update($validate);
-
-        return response()->json(["balance" => $wallet->balance]);
-    }
 
     /**
      * Remove the specified resource from storage.

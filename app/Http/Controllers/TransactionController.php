@@ -28,9 +28,29 @@ class TransactionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function deposit(Request $request, Wallet $wallet, Transaction $transaction)
     {
-        //
+        $balance = $wallet->balance;
+        $walletValidate["balance"] = $balance + $request->balance;
+        $wallet->update($walletValidate);
+
+        $transactionValidate["wallet_id"] = $wallet->id;
+        $transactionValidate["type"] = "deposit";
+        $transactionValidate["amount"] = $request->balance;
+        $transactionValidate["description"] = "Dépôt initial";
+        $transactionValidate["balance_after"] = $wallet->balance;
+        $transactionItem = $transaction->create($transactionValidate);
+
+        return response()->json(
+            [
+                "success" => true,
+                "message" => "Dépôt effectué avec succès.",
+                "data" => [
+                    "transaction" => $transactionItem,
+                    "wallet" => $wallet,
+                    ]
+                ]
+            );
     }
 
     /**
