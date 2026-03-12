@@ -63,9 +63,7 @@ class AuthController extends Controller
 
         $validate["password"] = Hash::make($validate["password"]);
 
-        $user = User::create($validate);
-        $token = $user->createToken("UserToken")->plainTextToken;
-        if (User::contains($validate["email"])) {
+        if (User::where("email", $validate["email"])->exists()) {
             return response()->json([
                 "success" => false,
                 "message" => "Erreur de validation.",
@@ -75,6 +73,9 @@ class AuthController extends Controller
                 ]
             ], 201);
         } else {
+            $user = User::create($validate);
+            $token = $user->createToken("UserToken")->plainTextToken;
+            
             return response()->json([
                 "success" => true,
                 "message" => "Inscription réussie.",

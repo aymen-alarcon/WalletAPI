@@ -32,7 +32,7 @@ class WalletController extends Controller
      */
     public function store(WalletRequest $request, Wallet $wallet)
     {
-            $request->validated();
+            $validate = $request->validated();
             $validate["user_id"] = Auth::user()->id;
             $wallet->create($validate);
             return response()->json([
@@ -47,11 +47,16 @@ class WalletController extends Controller
      */
     public function show(Wallet $wallet)
     {
-        if ($wallet->user->id === Auth::user()->id) {
+        if (!$wallet) {
             return response()->json([
                 "success" => false,
-                "message" => "Détail du wallet récupéré.",
-            ]);
+                "message" => "Wallet introuvable.",
+            ], 404);
+        }else if ($wallet->user->id !== Auth::user()->id) {
+            return response()->json([
+                "success" => false,
+                "message" => "Vous n'êtes pas autorisé à accéder à ce wallet.",
+            ], 403);
         } else {
             return response()->json([
                 "success" => true,
@@ -59,7 +64,6 @@ class WalletController extends Controller
                 "wallet" => $wallet,
             ]);
         }
-        
     }
 
     /**
