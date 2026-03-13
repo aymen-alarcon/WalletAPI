@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WalletRequest extends FormRequest
+class TransactionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,16 +22,17 @@ class WalletRequest extends FormRequest
     public function rules()
     {
         return [
-                "name" => ["required",'string'],
-                "balance" => ["sometimes","required","numeric","min:0"],
-                "currency" => ["required","string","max:3"],
+            "receiver_wallet_id" => ["required", "exists:wallets,id"],
+            "amount" => ["required", "numeric", "min:0"]
         ];
     }
 
-    public function messages(){
+    public function messages()
+    {
         return [
-            "name.required" => "Le nom du wallet est obligatoire.",
-            "currency.required" => "La devise sélectionnée n'est pas valide.",
+            "receiver_wallet_id.required" => "Le wallet destinataire est obligatoire.",
+            "amount.min" => "Le montant doit être supérieur à 0.",
+            "receiver_wallet_id.exists" => "Le wallet destinataire est introuvable."
         ];
     }
 }
