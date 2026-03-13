@@ -22,7 +22,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function(ValidationException $e){
             return response()->json([
                 "success" => false,
-                "message" => "Erreur de validation.",
                 "error" => $e->getMessage(),
             ], 422);
         });
@@ -30,7 +29,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function(ModelNotFoundException $e){
             return response()->json([
                 "success" => false,
-                "message" => "Erreur de validation.",
                 "error" => $e->getMessage(),
             ], 404);
         });

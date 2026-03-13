@@ -10,8 +10,10 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     public function index(Wallet $wallet){
-        $transaction = Transaction::whereAny(["wallet_id", "receiver_wallet_id"],"=", $wallet->id)->get();
+        $transaction = Transaction::whereAny(["wallet_id", "receiver_wallet_id"],"=", $wallet->id)->latest()->paginate(15);
         return response()->json([
+            "success" => true,
+            "messages" => "Historique des transactions récupéré.",
             $transaction,
         ]);
     }
@@ -107,8 +109,7 @@ class TransactionController extends Controller
                         "transaction" => $transactionItem,
                         "wallet" => $wallet,
                         ]
-                    ]
-                );
+                    ]);
         }else {
             return response()->json([
                 "success" => false,
