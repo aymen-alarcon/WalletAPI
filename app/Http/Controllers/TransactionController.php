@@ -9,15 +9,18 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function index(Request $request, Wallet $wallet){
-        Transaction::where("wallet_id", $wallet)->get();
+    public function index(Wallet $wallet){
+        $transaction = Transaction::whereAny(["wallet_id", "receiver_wallet_id"],"=", $wallet->id)->get();
+        return response()->json([
+            $transaction,
+        ]);
     }
 
     public function withdraw(Request $request, Wallet $wallet, Transaction $transaction)
     {
         if ($request->amount < $wallet->balance) {
             $transactionValidate["wallet_id"] = $wallet->id;
-            $transactionValidate["receiver_wallet_id"] = NULL;
+            $transactionValidate["receiver_wallet_id"] = $request->receiver_wallet_id;
             $transactionValidate["type"] = "deposit";
             $transactionValidate["amount"] = $request->amount;
             $transactionValidate["description"] = $request->description;
@@ -49,7 +52,7 @@ class TransactionController extends Controller
     {
         if ($request->amount >= 0) {
             $transactionValidate["wallet_id"] = $wallet->id;
-            $transactionValidate["receiver_wallet_id"] = NULL;
+            $transactionValidate["receiver_wallet_id"] = $request->receiver_wallet_id;
             $transactionValidate["type"] = "deposit";
             $transactionValidate["amount"] = $request->amount;
             $transactionValidate["description"] = "Dépôt initial";
@@ -81,7 +84,6 @@ class TransactionController extends Controller
     public function transfer(TransactionRequest $request, Wallet $wallet, Transaction $transaction)
     {
         $transactionValidate = $request->validated();
-        $receiverWalletValidation = $request->validated();
         $receiverWallet = $wallet->where("id", $request->receiver_wallet_id)->first();
         if($wallet->currency !== $receiverWallet->currency){
             $transactionValidate["wallet_id"] = $wallet->id;
